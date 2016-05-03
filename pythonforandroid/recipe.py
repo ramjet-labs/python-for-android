@@ -857,6 +857,10 @@ class CompiledComponentsPythonRecipe(PythonRecipe):
 
     build_cmd = 'build_ext'
 
+    def extra_build_ext_args(self, arch):
+        return []
+
+
     def build_arch(self, arch):
         '''Build any cython components, then install the Python module by
         calling setup.py install with the target Python dir.
@@ -874,7 +878,7 @@ class CompiledComponentsPythonRecipe(PythonRecipe):
             if self.install_in_hostpython:
                 shprint(hostpython, 'setup.py', 'clean', '--all', _env=env)
             shprint(hostpython, 'setup.py', self.build_cmd, '-v',
-                    _env=env, *self.setup_extra_args)
+                    _env=env, *(self.setup_extra_args + self.extra_build_ext_args(arch)))
             build_dir = glob.glob('build/lib.*')[0]
             shprint(sh.find, build_dir, '-name', '"*.o"', '-exec',
                     env['STRIP'], '{}', ';', _env=env)
@@ -913,6 +917,9 @@ class CythonRecipe(PythonRecipe):
         self.build_cython_components(arch)
         self.install_python_package(arch)
 
+    def extra_build_ext_args(self, arch):
+        return []
+
     def build_cython_components(self, arch):
         info('Cythonizing anything necessary in {}'.format(self.name))
 
@@ -940,7 +947,7 @@ class CythonRecipe(PythonRecipe):
             manually_cythonise = False
             try:
                 shprint(hostpython, 'setup.py', 'build_ext', '-v', _env=env,
-                        *self.setup_extra_args)
+                        *(self.setup_extra_args + self.extra_build_ext_args(arch)))
             except sh.ErrorReturnCode_1:
                 print()
                 info('{} first build failed (as expected)'.format(self.name))

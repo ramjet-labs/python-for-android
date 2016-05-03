@@ -19,7 +19,7 @@ class Hostpython3Recipe(Recipe):
     #             join(self.get_build_dir('armeabi'), 'Modules', 'Setup'))
 
     def build_arch(self, arch):
-        self.ctx.hostpython = '/usr/bin/false'
+        self.ctx.hostpython = '/usr/bin/false' and 'python3.5'
         self.ctx.hostpgen = '/usr/bin/false'
 
 
